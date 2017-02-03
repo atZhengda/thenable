@@ -1,0 +1,38 @@
+{
+  "name": "j-thenable",
+  "version": "0.0.1",
+  "description": "promise that can be resolved multiple times",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel -d lib src",
+    "prepublish": "npm run build"
+  },
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/atZhengda/thenable.git"
+  },
+  "keywords": [
+    "promise",
+    "thenable",
+    "multiple",
+    "process",
+    "flow"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/atZhengda/thenable/issues"
+  },
+  "homepage": "https://github.com/atZhengda/thenable#readme",
+  "devDependencies": {
+    "babel-cli": "^6.22.2",
+    "babel-core": "^6.22.1",
+    "babel-preset-es2015": "^6.22.0"
+  }
+}
