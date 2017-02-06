@@ -4,10 +4,10 @@
 ```
 import Thenable from 'j-thenable';
 
-Thenable.create((t)=>{
-  t.resolve(5);
-  t.resolve(6);
-})
+  new Thenable(function(resolve,reject){
+    resolve(5);
+    resolve(6);
+  })
   .then(v=>console.log(v))
   .then(()=>{
     throw new Error('Error');

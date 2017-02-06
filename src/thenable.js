@@ -1,7 +1,7 @@
 //multi resovable promises
 //reference from es6-promise polyfill package
 
-import {notNull,isFunc} from './types';
+import {isNull,notNull,isFunc} from './types';
 import {Queue} from './queue';
 // const PENDING='PENDING';
 const RESOLVED='RESOLVED';
@@ -56,16 +56,30 @@ const invokeCallback=(context,preValue)=>{
 export default class Thenable{
 
   constructor(onFulfillment,onRejection){
-    if(notNull(onFulfillment)&&!isFunc(onFulfillment)){
-      throw new Error('on fulfillment argument has to be function')
+    if(onRejection===void 0 && isFunc(onFulfillment)){
+      /*compatible syntax for
+        new Promise(function resolver(resolve,reject))
+      */
+      asyncFunc(()=>{
+        onFulfillment(this.resolve,this.reject);
+      })
+    }else{
+      /*thenable syntax
+        new Thenable(onFulfillment,onRejection)
+      */
+      if(notNull(onFulfillment)&&!isFunc(onFulfillment)){
+        throw new Error('on fulfillment argument has to be function')
+      }
+      if(notNull(onRejection)&&!isFunc(onRejection)){
+        throw new Error('on rejection argument has to be function')
+      }
+      this._onFulfillment=onFulfillment;
+      this._onRejection=onRejection;
     }
-    if(notNull(onRejection)&&!isFunc(onRejection)){
-      throw new Error('on rejection argument has to be function')
-    }
+
     this._next=[];
     this._pool=Queue();//could not use queue
-    this._onFulfillment=onFulfillment;
-    this._onRejection=onRejection;
+
     //catch is a keyword
     this['catch']=function(onReject){
       return this.then(null,onReject);
@@ -127,7 +141,11 @@ export default class Thenable{
     return this;
   }
   then(onFulfillment,onRejection){
-    const nextThenable=new Thenable(onFulfillment,onRejection);
+    let _onRejection=onRejection;
+    if(isNull(onRejection)){
+      _onRejection=null;
+    }
+    const nextThenable=new Thenable(onFulfillment,_onRejection);
     this._next.push(nextThenable);
     return nextThenable;
   }
