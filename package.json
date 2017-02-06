@@ -1,6 +1,6 @@
 {
   "name": "j-thenable",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "promise that can be resolved multiple times",
   "main": "index.js",
   "scripts": {
