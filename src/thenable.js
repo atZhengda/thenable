@@ -61,7 +61,7 @@ export default class Thenable{
         new Promise(function resolver(resolve,reject))
       */
       asyncFunc(()=>{
-        onFulfillment(this.resolve,this.reject);
+        onFulfillment(this.resolve.bind(this),this.reject.bind(this));
       })
     }else{
       /*thenable syntax
