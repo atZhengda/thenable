@@ -147,7 +147,42 @@ export default class Thenable{
     }
     const nextThenable=new Thenable(onFulfillment,_onRejection);
     this._next.push(nextThenable);
+    if(this._switch){
+      nextThenable._switch=this._switch;
+    }
     return nextThenable;
+  }
+  if(condition){
+    //create _if and _else, bridge them
+    const _if=new Thenable();
+    const _else=new Thenable();
+    const {_switch}=this;
+    this.then((value)=>{
+      (condition(value)?_if:_else).resolve(value)
+    },err=>{
+      throw new Error(err);
+    })
+    _if._switch={
+      _if,
+      _else,
+      _tail: [],
+      _pre: _switch
+    };
+    _else._switch=_if._switch;
+    return _if;
+  }
+  else(){
+    const {_switch: { _tail,_else }}=this;
+    _tail.push(this);
+    return _else;
+  }
+  endIf(){
+    // bridge tails and main chain
+    const {_switch: { _tail,_pre }}=this;
+    _tail.push(this);
+    const link=Thenable.join(_tail);
+    link._switch=_pre;
+    return link;
   }
   static create(func){
     return (new Thenable()).subscribe(func);

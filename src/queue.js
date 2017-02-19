@@ -5,6 +5,7 @@ export const Queue = () => {
   tail= -1;
   const queue = {
     push (value) {
+      //TODO check for overdraft and ignore the values
       array[++tail] = value;
       array[tail+1]=undefined;
       return value;
