@@ -10,12 +10,11 @@ export const Queue = () => {
       return value;
     },
     pop () {
-      if (tail >= head) {
-        const value = array[head];
-        array[head] = undefined;
-        head += 1;
-        return value;
-      }
+      //allow over draft
+      const value = array[head];
+      array[head] = undefined;
+      head += 1;
+      return value;
     },
     isEmpty () {
       return tail < head;

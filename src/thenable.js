@@ -78,7 +78,7 @@ export default class Thenable{
     }
 
     this._next=[];
-    this._pool=Queue();//could not use queue
+    this._pool=Queue();
 
     //catch is a keyword
     this['catch']=function(onReject){
@@ -157,6 +157,64 @@ export default class Thenable{
   }
   static reject(reason){
     return (new Thenable()).reject(reason);
+  }
+  static all(thenables){
+    const batches=thenables.map(t=>Queue());
+    return new Thenable(function(resolve,reject){
+      const checkAndDispatch=()=>{
+          const dispatchable=batches.reduce((mem,cur)=>{
+            return mem&&!cur.isEmpty();
+          },true);
+          if(dispatchable){
+            const batch=batches.map(b=>b.pop());
+            try{
+              resolve(batch);
+            }catch(err){
+              reject(err);
+            }
+          }
+      };
+      thenables
+        .map(t=>Thenable.resolve(t))
+        .forEach((t,index)=>{
+          t.then(value=>{
+            batches[index].push(value);
+            checkAndDispatch();
+          },reason=>{
+            batches.filter((b,i)=>i!==index).forEach(b=>b.pop());
+            reject(reason);
+          })
+        })
+    });
+  }
+  static race(thenables){
+    const batches=thenables.map(t=>Queue());
+    return new Thenable(function(resolve,reject){
+      thenables
+        .map(t=>Thenable.resolve(t))
+        .forEach((t,index)=>{
+          t.then(value=>{
+            batches[index].push(void 0);
+            if(!batches[index].isEmpty()){
+              resolve(value);
+            }
+            batches.forEach(b=>b.pop());
+          },reason=>{
+            batches[index].push(void 0);
+            if(!batches[index].isEmpty()){
+              reject(reason);
+            }
+            batches.forEach(b=>b.pop());
+          })
+        })
+    });
+  }
+  static join(thenables){
+    return new Thenable(function(resolve,reject){
+      thenables
+        .map(t=>Thenable.resolve(t))
+        .forEach(t=>t.then(resolve,reject));
+    });
   }
 }
 export {Thenable};
