@@ -156,16 +156,17 @@ export default class Thenable{
     //create _if and _else, bridge them
     const _if=new Thenable();
     const _else=new Thenable();
+    const _error=new Thenable();
     const {_switch}=this;
     this.then((value)=>{
       (condition(value)?_if:_else).resolve(value)
     },err=>{
-      throw new Error(err);
+      _error.reject(err);
     })
     _if._switch={
       _if,
       _else,
-      _tail: [],
+      _tail: [_error],
       _pre: _switch
     };
     _else._switch=_if._switch;

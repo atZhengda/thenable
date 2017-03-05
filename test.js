@@ -1,4 +1,5 @@
- const {Thenable} =require('./lib');
+
+const {Thenable} =require('./lib');
 const delay=n=>new Thenable(function(resolve,reject){
   setTimeout(
     ()=>resolve(n),
@@ -34,6 +35,8 @@ var t2=Thenable.create(t=>{
       counter+=2;
       if(counter<10){
         tick();
+      }else{
+        t.reject('finished')
       }
     },1000)
   }
@@ -50,4 +53,4 @@ Thenable.join([t1,t2])
     .then(n=>2*n)
   .endIf()
   .then(n=>console.log('received',n))
-  .catch(err=>console.log(err))
+  .catch(err=>console.log('error',err))
